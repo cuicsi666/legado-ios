@@ -1,0 +1,64 @@
+name: Legado
+options:
+  bundleIdPrefix: com.legado
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: zh_CN
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    SWIFT_VERSION: "5.10"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_IDENTITY: ""
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGNING_ALLOWED: NO
+    GENERATE_INFOPLIST_FILE: NO
+    INFOPLIST_FILE: Resources/Info.plist
+    PRODUCT_BUNDLE_IDENTIFIER: com.legado.app
+    INFOPLIST_KEY_CFBundleDisplayName: Legado
+    INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.books
+    INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+    INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+    INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    ENABLE_PREVIEWS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+
+packages:
+  SwiftSoup:
+    url: https://github.com/scinfu/SwiftSoup.git
+    from: "2.6.0"
+  Kanna:
+    url: https://github.com/tid-kijyun/Kanna.git
+    from: "5.2.4"
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation.git
+    from: "0.9.19"
+
+targets:
+  Legado:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Core
+      - path: Features
+      - path: Resources/Assets.xcassets
+      - path: Resources/Info.plist
+      - path: Core/Persistence/Legado.xcdatamodeld
+    dependencies:
+      - package: SwiftSoup
+      - package: Kanna
+      - package: ZIPFoundation
+    settings:
+      base:
+        # 全能签安装不需要 entitlements，注释掉可避免 CloudKit 相关编译问题
+        # ENTITLEMENTS_FILE: Resources/Legado.entitlements
+        CODE_SIGN_ENTITLEMENTS: ""
