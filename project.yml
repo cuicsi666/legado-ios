@@ -6,8 +6,6 @@ options:
   developmentLanguage: zh_CN
   createIntermediateGroups: true
   groupSortPosition: top
-  # 让 xcodegen 生成兼容 Xcode 15.4 的旧版项目格式（否则 objectVersion 77 打不开）
-  xcodeVersion: "15.4"
 
 settings:
   base:
