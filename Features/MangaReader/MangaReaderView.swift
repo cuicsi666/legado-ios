@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct MangaReaderView: View {
     @StateObject private var viewModel = MangaReaderViewModel()
@@ -119,7 +120,7 @@ class MangaReaderViewModel: ObservableObject {
         
         do {
             let content = try await WebBook.getContent(source: source, book: book, chapter: chapter)
-            let imageURLs = content.imageURLs
+            let imageURLs = extractImageURLs(from: content)
             
             if !imageURLs.isEmpty {
                 images = imageURLs
@@ -128,6 +129,26 @@ class MangaReaderViewModel: ObservableObject {
         } catch {
             errorMessage = "加载失败: \(error.localizedDescription)"
         }
+    }
+    
+    /// 从章节正文中提取图片 URL（直接 URL 列表或 HTML <img src>）
+    private func extractImageURLs(from content: String) -> [String] {
+        var urls: [String] = []
+        let pattern = "(https?://[^\\s<>\"']+\\.(?:jpg|jpeg|png|gif|webp|bmp|avif)(?:\\?[^\\s<>\"']*)?)"
+        if let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) {
+            let ns = content as NSString
+            let matches = regex.matches(in: content, range: NSRange(location: 0, length: ns.length))
+            for m in matches {
+                let u = ns.substring(with: m.range)
+                if !urls.contains(u) { urls.append(u) }
+            }
+        }
+        // 兜底：整行若本身就是一个图片地址
+        if urls.isEmpty, let single = content.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "\n").first,
+           let parsed = URL(string: String(single)), parsed.scheme != nil {
+            urls.append(String(single))
+        }
+        return urls
     }
     
     func loadMoreImages() async {
@@ -186,11 +207,5 @@ struct ZoomableImageView: View {
             }
         }
         .frame(maxWidth: .infinity)
-    }
-}
-
-private extension Array {
-    subscript(safe index: Int) -> Element? {
-        indices.contains(index) ? self[index] : nil
     }
 }

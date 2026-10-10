@@ -66,31 +66,43 @@ class RemoteCommandHandler {
     }
     
     private func handlePlay() {
-        if let audioManager = audioPlayManager, audioManager.isPlaying == false {
-            audioManager.play()
-        } else if let tts = ttsManager, tts.isPlaying == false {
-            tts.play()
+        Task { @MainActor in
+            if let audioManager = self.audioPlayManager, audioManager.isPlaying == false {
+                audioManager.play()
+            } else if let tts = self.ttsManager, tts.state.isSpeaking == false {
+                tts.resume()
+            }
         }
     }
     
     private func handlePause() {
-        audioPlayManager?.pause()
-        ttsManager?.pause()
+        Task { @MainActor in
+            self.audioPlayManager?.pause()
+            self.ttsManager?.pause()
+        }
     }
     
     private func handleNext() {
-        Task { await audioPlayManager?.nextChapter() }
+        Task { @MainActor in
+            await self.audioPlayManager?.nextChapter()
+        }
     }
     
     private func handlePrevious() {
-        Task { await audioPlayManager?.prevChapter() }
+        Task { @MainActor in
+            await self.audioPlayManager?.prevChapter()
+        }
     }
     
     private func handleSkipForward(interval: TimeInterval) {
-        audioPlayManager?.seek(by: interval)
+        Task { @MainActor in
+            self.audioPlayManager?.seek(by: interval)
+        }
     }
     
     private func handleSkipBackward(interval: TimeInterval) {
-        audioPlayManager?.seek(by: -interval)
+        Task { @MainActor in
+            self.audioPlayManager?.seek(by: -interval)
+        }
     }
 }

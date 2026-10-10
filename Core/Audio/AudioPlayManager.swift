@@ -9,6 +9,7 @@
 import Foundation
 import AVFoundation
 import MediaPlayer
+import CoreData
 
 @MainActor
 class AudioPlayManager: ObservableObject {
@@ -40,7 +41,11 @@ class AudioPlayManager: ObservableObject {
     }
     
     deinit {
-        cleanup()
+        if let observer = timeObserver {
+            player?.removeTimeObserver(observer)
+        }
+        player?.pause()
+        try? AVAudioSession.sharedInstance().setActive(false)
     }
     
     // MARK: - 音频会话配置
@@ -48,7 +53,7 @@ class AudioPlayManager: ObservableObject {
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .spokenAudio, options: [.allowsAirPlay, .allowBluetooth])
+            try session.setCategory(.playback, mode: .spokenAudio, options: [.allowAirPlay, .allowBluetooth])
             try session.setActive(true)
         } catch {
             print("音频会话配置失败: \(error)")
@@ -118,7 +123,7 @@ class AudioPlayManager: ObservableObject {
             totalChapters = chapters.count
             
             // 从上次位置继续
-            if book.durChapterIndex < chapters.count {
+            if Int(book.durChapterIndex) < chapters.count {
                 currentChapterIndex = Int(book.durChapterIndex)
             }
             
@@ -153,7 +158,7 @@ class AudioPlayManager: ObservableObject {
             
             // 恢复播放位置
             if let book = currentBook, chapter.index == Int32(currentChapterIndex) {
-                await seekTo(book.durChapterPos)
+                await seekTo(Double(book.durChapterPos))
             }
             
         } catch {
@@ -177,18 +182,10 @@ class AudioPlayManager: ObservableObject {
             throw AudioError.noSource
         }
         
-        let content = try await WebBook.getContent(
-            source: source,
-            book: book,
-            chapter: chapter
-        )
-        
-        // 解析音频 URL
-        guard let audioURLString = content.audioURL,
-              let url = URL(string: audioURLString) else {
+        // 音频书直接用章节链接作为播放地址
+        guard let url = URL(string: chapter.chapterUrl) else {
             throw AudioError.invalidAudioURL
         }
-        
         return url
     }
     

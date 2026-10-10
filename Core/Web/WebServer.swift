@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 class WebServer {
     static let shared = WebServer()

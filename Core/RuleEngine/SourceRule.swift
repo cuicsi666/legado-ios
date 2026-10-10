@@ -210,7 +210,7 @@ class SourceRule {
                 if let groupRange = Range(match.range(at: 1), in: firstPart),
                    let groupNum = Int(firstPart[groupRange]) {
                     ruleType.append(groupNum)
-                    ruleParam.append(firstPart[Range(match.range, in: firstPart)!] ?? "")
+                    ruleParam.append(String(firstPart[Range(match.range, in: firstPart)!]))
                 }
                 
                 start = match.range.location + match.range.length

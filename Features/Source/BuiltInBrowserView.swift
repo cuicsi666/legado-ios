@@ -225,10 +225,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
         
-        // 设置自定义 User-Agent
-        if let userAgent = viewModel.source?.userAgent, !userAgent.isEmpty {
-            webView.customUserAgent = userAgent
-        }
+        // 设置自定义 User-Agent（源站 header 默认即可）
         
         viewModel.webView = webView
         
@@ -420,7 +417,7 @@ class BrowserViewModel: ObservableObject {
 extension BuiltInBrowserView {
     /// 打开书源登录页面
     static func openForLogin(source: BookSource, onLoginSuccess: @escaping (String) -> Void) -> some View {
-        let loginURL = source.loginUrl.isEmpty ? source.bookSourceUrl : source.loginUrl
+        let loginURL = (source.loginUrl ?? "").isEmpty ? source.bookSourceUrl : source.loginUrl!
         let url = URL(string: loginURL)
         
         return BuiltInBrowserView(url: url, source: source, onCookiesSaved: onLoginSuccess)

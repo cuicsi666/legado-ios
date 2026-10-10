@@ -101,7 +101,7 @@ class SourceChecker: ObservableObject {
                httpResponse.statusCode == 200 {
                 return SourceCheckResult(source: source, status: .available, responseTime: responseTime)
             } else {
-                return SourceCheckResult(source: source, status: .error("HTTP \(response.map { ($0 as? HTTPURLResponse)?.statusCode ?? 0 } ?? 0)"), responseTime: responseTime)
+                return SourceCheckResult(source: source, status: .error("HTTP \(httpResponse.statusCode)"), responseTime: responseTime)
             }
         } catch {
             let responseTime = Date().timeIntervalSince(startTime)

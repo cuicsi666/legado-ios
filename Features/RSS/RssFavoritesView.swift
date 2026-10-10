@@ -24,7 +24,7 @@ struct RssFavoritesView: View {
                     }
                 } else {
                     List {
-                        ForEach(filteredFavorites) { star in
+                        ForEach(filteredFavorites, id: \.objectID) { star in
                             RssStarRow(star: star)
                         }
                         .onDelete(perform: deleteFavorites)
